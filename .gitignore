@@ -67,10 +67,8 @@ makefile
 [Dd]ebugPublic/
 [Rr]eleases/
 bld/
-build/
+build*
 [Oo]bj/
-build-Debug/
-build-Release/
 Submission/
 
 # Visual Studo 2015 cache/options directory
