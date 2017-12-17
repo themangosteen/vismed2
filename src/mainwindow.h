@@ -12,6 +12,7 @@
 #include <QProgressBar>
 #include <QStatusBar>
 #include <QVariant>
+#include <QComboBox>
 #include <QMouseEvent>
 
 
@@ -24,6 +25,8 @@ public:
 	MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
+	void openFile(QString filepath);
+
 signals:
 
 	void dataLoaded(Volume *volumeData);
@@ -32,7 +35,7 @@ protected slots :
 
 	void openFileAction();
 	void closeAction();
-    void setCompositing();
+	void setCompositing(int mode);
     void setShading();
 
 private:

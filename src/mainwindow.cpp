@@ -4,15 +4,19 @@
 #include <QPainter>
 
 MainWindow::MainWindow(QWidget *parent)
-	: QMainWindow(parent), volume(0)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+    , volume(0)
 {
-	ui = new Ui_MainWindow();
 	ui->setupUi(this);
+
 	ui->progressBar->hide();
+
 	glWidget = ui->glWidget;
 
 	connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(closeAction()));
 
+	connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(closeAction()));
 	connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openFileAction()));
 	connect(this, &MainWindow::dataLoaded, glWidget, &GLWidget::dataLoaded);
 
@@ -20,9 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->sampleStartSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), glWidget, &GLWidget::setSampleRangeStart);
 	connect(ui->sampleEndSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), glWidget, &GLWidget::setSampleRangeEnd);
     connect(ui->shadingThresholdSpinbox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), glWidget, &GLWidget::setShadingThreshold);
-	connect(ui->radioAlpha, &QRadioButton::clicked, this, &MainWindow::setCompositing);
-	connect(ui->radioMIP, &QRadioButton::clicked, this, &MainWindow::setCompositing);
-	connect(ui->radioAverage, &QRadioButton::clicked, this, &MainWindow::setCompositing);
+	connect(ui->comboBoxCompositingMethod, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::setCompositing);
 	connect(ui->loadTffImageButton, &QPushButton::clicked, glWidget, &GLWidget::loadTransferFunctionImage);
 	connect(ui->shadedCheckBox, &QCheckBox::clicked, glWidget, &GLWidget::setShading);
 
@@ -40,14 +42,18 @@ MainWindow::~MainWindow()
 
 void MainWindow::openFileAction()
 {
+	QString filepath = QFileDialog::getOpenFileName(this, "Data File", 0, tr("Data Files (*.dat)"));
 
-	QString filename = QFileDialog::getOpenFileName(this, "Data File", 0, tr("Data Files (*.dat)"));
+	openFile(filepath);
+}
 
-	if (!filename.isEmpty())
+void MainWindow::openFile(QString filepath)
+{
+	if (!filepath.isEmpty())
 	{
 		// store filename
-		fileType.filename = filename;
-		std::string fn = filename.toStdString();
+		fileType.filename = filepath;
+		std::string fn = filepath.toStdString();
 		bool success = false;
 
 		// progress bar and top label
@@ -56,14 +62,14 @@ void MainWindow::openFileAction()
 		ui->labelTop->setText("Loading data ...");
 
 		// load data according to file extension
-		if (fn.substr(fn.find_last_of(".") + 1) == "dat")		// LOAD VOLUME
+		if (fn.substr(fn.find_last_of(".") + 1) == "dat") // LOAD VOLUME
 		{
 			// create VOLUME
 			fileType.type = VOLUME;
 			volume = new Volume();
 
 			// load file
-			success = volume->loadFromFile(filename, ui->progressBar);
+			success = volume->loadFromFile(filepath, ui->progressBar);
 		}
 
 		ui->progressBar->setEnabled(false);
@@ -77,11 +83,11 @@ void MainWindow::openFileAction()
 				type = "VOLUME";
 				emit dataLoaded(volume);
 			}
-			ui->labelTop->setText(QString("Loaded VOLUME with dimensions %1 x %2 x %3 \n %4").arg(QString::number(volume->getWidth()), QString::number(volume->getHeight()), QString::number(volume->getDepth()), filename));
+			ui->labelTop->setText(QString("Loaded VOLUME with dimensions %1 x %2 x %3 \n %4").arg(QString::number(volume->getWidth()), QString::number(volume->getHeight()), QString::number(volume->getDepth()), filepath));
 		}
 		else
 		{
-			ui->labelTop->setText("ERROR loading file " + filename + "!");
+			ui->labelTop->setText("ERROR loading file " + filepath + "!");
 			ui->progressBar->setValue(0);
 		}
 	}
@@ -92,17 +98,9 @@ void MainWindow::closeAction()
 	close();
 }
 
-void MainWindow::setCompositing()
+void MainWindow::setCompositing(int mode)
 {
-	if (ui->radioMIP->isChecked())  {
-        glWidget->setCompositingMethod(GLWidget::CompositingMethod::MIP);
-	} else if (ui->radioAverage->isChecked()) {
-		glWidget->setCompositingMethod(GLWidget::CompositingMethod::AVERAGE);
-	} else if (ui->radioAlpha->isChecked()) {
-        glWidget->setCompositingMethod(GLWidget::CompositingMethod::ALPHA);
-	} else {
-        glWidget->setCompositingMethod(GLWidget::CompositingMethod::MIP);
-    }
+	glWidget->setCompositingMethod((GLWidget::CompositingMethod)mode);
 }
 
 void MainWindow::setShading()

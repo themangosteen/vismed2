@@ -5,24 +5,28 @@
 
 #include <QOpenGLWidget>
 #include <QOpenGLDebugLogger>
-#include <QOpenGLFunctions_3_3_Core>
+#include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLShader>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLTexture>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
+#include <Qt3DRender/QCamera>
 
 #include "volume.h"
 
 class MainWindow;
 
-class GLWidget : public QOpenGLWidget
+class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 
 public:
-    explicit GLWidget(QWidget *parent) : QOpenGLWidget(parent) {
+	explicit GLWidget(QWidget *parent)
+	    : QOpenGLWidget(parent)
+	    , volume(nullptr)
+	{
         mainWindow = qobject_cast<MainWindow *>(this->parent()->parent()->parent());
     }
     ~GLWidget();
@@ -30,7 +34,8 @@ public:
     enum CompositingMethod {
         MIP        = 0,
         AVERAGE    = 1,
-        ALPHA      = 2
+		ALPHA      = 2,
+		MIDA       = 3
     };
 
 public slots:
@@ -46,18 +51,26 @@ public slots:
 
 protected:
 
-    void initializeGL();
+	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+	void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+	void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
-    void paintGL();
+	void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
 
-    void resizeGL(int w, int h);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+	void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+	void keyReleaseEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+
+protected slots:
+
+	void paintGL() Q_DECL_OVERRIDE;
+	void initializeGL() Q_DECL_OVERRIDE;
+	void resizeGL(int w, int h) Q_DECL_OVERRIDE;
 
 private:
 
-    void initShaders();
+	// SHADERS AND DATA
+
+	void initShaders();
 
     void loadTransferFunction1DTex(const QString &fileName);
     void initRayVolumeExitPosMapFramebuffer();
@@ -67,13 +80,6 @@ private:
     void initVolumeBBoxCubeVBO();
     void drawVolumeBBoxCube(GLenum glFaceCullingMode, QOpenGLShaderProgram *shader);
 
-    MainWindow * mainWindow;
-
-    QOpenGLDebugLogger *logger;
-    void printDebugMsg(const QOpenGLDebugMessage &msg) { qDebug() << qPrintable(msg.message()); }
-
-    QOpenGLFunctions_3_3_Core *glf;
-
     QOpenGLShaderProgram *rayVolumeExitPosMapShader;
     QOpenGLShaderProgram *raycastShader;
 
@@ -82,14 +88,12 @@ private:
     QOpenGLTexture *volume3DTex;
     QOpenGLTexture *gradients3DTex;
 
-    Volume *volume;
+	Volume *volume;
     std::vector<QVector3D> gradients;
 
     QOpenGLVertexArrayObject volumeBBoxCubeVAO;
 
     QMatrix4x4 modelMat;
-    QMatrix4x4 viewMat;
-    QMatrix4x4 projMat;
 
     GLfloat cubeVertices[24] = {
         // front
@@ -125,6 +129,9 @@ private:
         6, 7, 3,
     };
 
+
+	// RENDERING PARAMETERS
+
     QColor backgroundColor;
     int numSamples = 200;
 	int numSamplesInteractive = 0;
@@ -134,11 +141,21 @@ private:
     CompositingMethod compositingMethod = CompositingMethod::MIP;
     bool enableShading = false;
 
-    QPoint lastMousePos;
-    float volumeRotAngleX;
-    float volumeRotAngleY;
-    float volumeRotAngleZ;
-    QVector3D viewOffset;
+
+	// UI AND INTERACTION
+
+	MainWindow *mainWindow;
+
+	Qt3DRender::QCamera camera;
+	QPoint lastMousePos; // last mouse position (to determine mouse movement delta)
+
+	void initCamera();
+
+
+	// DEBUG
+
+	QOpenGLDebugLogger *logger;
+	void printDebugMsg(const QOpenGLDebugMessage &msg) { qDebug() << qPrintable(msg.message()); }
 
 };
 

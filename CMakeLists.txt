@@ -23,6 +23,8 @@ find_package(Qt5UiTools)
 find_package(Qt5Widgets)
 find_package(Qt5OpenGL)
 find_package(Qt5OpenGLExtensions)
+find_package(Qt53DCore)
+find_package(Qt53DRender)
 
 
 ### SOURCE FILES ###
@@ -68,6 +70,8 @@ target_link_libraries(
     Qt5::Widgets
     Qt5::OpenGL
     Qt5::OpenGLExtensions
+    Qt5::3DCore
+    Qt5::3DRender
 )
 ### COPY SHADERS ###
 
