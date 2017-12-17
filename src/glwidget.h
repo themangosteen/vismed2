@@ -34,11 +34,12 @@ public:
     enum CompositingMethod {
         MIP        = 0,
         AVERAGE    = 1,
-		ALPHA      = 2,
-		MIDA       = 3
+		MIDA       = 2,
+		ALPHA      = 3
     };
 
 public slots:
+
     void dataLoaded(Volume *volume);
 
     void setNumSamples(int numSamples);
@@ -48,6 +49,7 @@ public slots:
     void loadTransferFunctionImage();
     void setShading(bool enableShading);
     void setShadingThreshold(double thresh);
+	void setPerspective(bool enabled);
 
 protected:
 
@@ -134,13 +136,13 @@ private:
 
     QColor backgroundColor;
     int numSamples = 200;
-	int numSamplesInteractive = 0;
+	const int NUM_SAMPLES_STATIC = 200;
+	const int NUM_SAMPLES_INTERACTION = 5;
     float sampleRangeStart = 0.000f;
     float sampleRangeEnd = 1.000f;
 	float shadingThreshold = 0.15f;
     CompositingMethod compositingMethod = CompositingMethod::MIP;
     bool enableShading = false;
-
 
 	// UI AND INTERACTION
 

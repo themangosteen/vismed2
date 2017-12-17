@@ -110,7 +110,10 @@ void main()
         if (avgIntensity > 1.0) { avgIntensity = 1.0; }
         outColor = texture(transferFunction, avgIntensity);
 
-    } else if (compositingMethod == 2) {  // ALPHA COMPOSITING
+    } else if (compositingMethod == 2) {  // MIDA COMPOSITING
+        // TODO
+        outColor = colorAccum;
+    } else if (compositingMethod == 3) {  // ALPHA COMPOSITING
         outColor = colorAccum;
     }
 

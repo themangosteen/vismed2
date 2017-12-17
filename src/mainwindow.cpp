@@ -24,9 +24,11 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->sampleStartSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), glWidget, &GLWidget::setSampleRangeStart);
 	connect(ui->sampleEndSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), glWidget, &GLWidget::setSampleRangeEnd);
     connect(ui->shadingThresholdSpinbox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), glWidget, &GLWidget::setShadingThreshold);
-	connect(ui->comboBoxCompositingMethod, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::setCompositing);
+	connect(ui->compositingModeComboBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::setCompositing);
+	connect(ui->loadDataPushButton, &QPushButton::clicked, this, &MainWindow::openFileAction);
 	connect(ui->loadTffImageButton, &QPushButton::clicked, glWidget, &GLWidget::loadTransferFunctionImage);
 	connect(ui->shadedCheckBox, &QCheckBox::clicked, glWidget, &GLWidget::setShading);
+	connect(ui->perspectiveCheckBox, &QCheckBox::clicked, glWidget, &GLWidget::setPerspective);
 
 }
 
@@ -83,7 +85,7 @@ void MainWindow::openFile(QString filepath)
 				type = "VOLUME";
 				emit dataLoaded(volume);
 			}
-			ui->labelTop->setText(QString("Loaded VOLUME with dimensions %1 x %2 x %3 \n %4").arg(QString::number(volume->getWidth()), QString::number(volume->getHeight()), QString::number(volume->getDepth()), filepath));
+			ui->labelTop->setText(QString("Loaded VOLUME [%1 x %2 x %3] \n %4").arg(QString::number(volume->getWidth()), QString::number(volume->getHeight()), QString::number(volume->getDepth()), filepath));
 		}
 		else
 		{

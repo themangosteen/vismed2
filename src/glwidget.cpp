@@ -60,7 +60,7 @@ void GLWidget::initializeGL()
 void GLWidget::initCamera()
 {
 	camera.setProjectionType(Qt3DRender::QCameraLens::OrthographicProjection);
-	camera.setPosition(QVector3D(0,-4,0));
+	camera.setPosition(QVector3D(0,-2,0));
 	camera.rotate(QQuaternion::fromEulerAngles(90,180,0));
 	camera.setViewCenter(QVector3D(0,0,0));
 
@@ -313,6 +313,16 @@ void GLWidget::drawVolumeBBoxCube(GLenum glFaceCullMode, QOpenGLShaderProgram *s
 
 }
 
+void GLWidget::setPerspective(bool enabled)
+{
+	if (enabled)
+		camera.setProjectionType(Qt3DRender::QCameraLens::PerspectiveProjection);
+	else
+		camera.setProjectionType(Qt3DRender::QCameraLens::OrthographicProjection);
+
+	repaint();
+}
+
 void GLWidget::setNumSamples(int numSamples)
 {
 	this->numSamples = numSamples;
@@ -361,12 +371,12 @@ void GLWidget::resizeGL(int w, int h)
 {
 	rayVolumeExitPosMapFramebuffer = new QOpenGLFramebufferObject(w, h, QOpenGLFramebufferObject::Depth);
 
-	camera.setAspectRatio(float(w) / h);
+	//camera.setAspectRatio(float(w) / h);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
-	this->numSamplesInteractive = this->numSamples > 5 ? this->numSamples : this->numSamplesInteractive;
+	this->numSamples = this->NUM_SAMPLES_INTERACTION;
 	lastMousePos = event->pos();
 }
 
@@ -380,15 +390,27 @@ void GLWidget::wheelEvent(QWheelEvent *event)
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-	this->numSamples = 5; // SET SAMPLES LOWER FOR BETTER PERFORMANCE, RESET AFTER MOUSE RELEASE!
+	this->numSamples = 10; // SET SAMPLES LOWER FOR BETTER PERFORMANCE, RESET AFTER MOUSE RELEASE!
 
 	int dx = event->x() - lastMousePos.x();
 	int dy = event->y() - lastMousePos.y();
 
-	// rotate camera
-	if (event->buttons() & Qt::LeftButton || event->buttons() & Qt::RightButton) {
-		camera.tiltAboutViewCenter(dy / 10.0f);
-		camera.panAboutViewCenter(dx / 10.0f, QVector3D(0,0,1)); // constraint around up axis
+	if (event->buttons() & Qt::LeftButton) {
+
+		if (event->modifiers() & Qt::ShiftModifier) {
+			// move camera
+			camera.translate(QVector3D(-dx/1000.f, dy/1000.f, 0));
+		}
+		else if (event->modifiers() & Qt::AltModifier) {
+			// zoom camera
+			float fov = std::max(20.0f, std::min(camera.fieldOfView() - dy/10.f, 120.0f));
+			camera.setFieldOfView(fov);
+		}
+		else {
+			// rotate camera
+			camera.tiltAboutViewCenter(dy/10.f);
+			camera.panAboutViewCenter(dx/10.f, QVector3D(0,0,1)); // constraint around up axis
+		}
 	}
 
 	lastMousePos = event->pos();
@@ -397,7 +419,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *)
 {
-	this->numSamples = this->numSamplesInteractive;
+	this->numSamples = this->NUM_SAMPLES_STATIC;
     repaint();
 }
 
