@@ -267,6 +267,7 @@ void GLWidget::paintGL()
 	raycastShader->setUniformValue("compositingMethod", compositingMethod);
 	raycastShader->setUniformValue("enableShading", enableShading);
     raycastShader->setUniformValue("shadingThreshold", shadingThreshold);
+	raycastShader->setUniformValue("opacityOffset", opacityOffset);
 
 	raycastShader->setUniformValue("transferFunction", 0); // bind shader uniform to texture unit 0
     transferFunction1DTex->bind(0); // bind texture to texture unit 0
@@ -347,6 +348,12 @@ void GLWidget::setShadingThreshold(double thresh)
     repaint();
 }
 
+void GLWidget::setOpacityOffset(int offset)
+{
+	this->opacityOffset = offset/1000.f;
+	repaint();
+}
+
 void GLWidget::setCompositingMethod(CompositingMethod m)
 {
 	this->compositingMethod = m;
@@ -376,7 +383,7 @@ void GLWidget::resizeGL(int w, int h)
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
-	this->numSamples = this->NUM_SAMPLES_INTERACTION;
+	setNumSamples(this->NUM_SAMPLES_INTERACTIVE);
 	lastMousePos = event->pos();
 }
 
@@ -390,7 +397,7 @@ void GLWidget::wheelEvent(QWheelEvent *event)
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-	this->numSamples = 10; // SET SAMPLES LOWER FOR BETTER PERFORMANCE, RESET AFTER MOUSE RELEASE!
+	setNumSamples(this->NUM_SAMPLES_INTERACTIVE);
 
 	int dx = event->x() - lastMousePos.x();
 	int dy = event->y() - lastMousePos.y();
@@ -419,8 +426,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *)
 {
-	this->numSamples = this->NUM_SAMPLES_STATIC;
-    repaint();
+	setNumSamples(this->NUM_SAMPLES_STATIC);
+	repaint();
 }
 
 void GLWidget::keyPressEvent(QKeyEvent *event)

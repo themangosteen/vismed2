@@ -49,6 +49,7 @@ public slots:
     void loadTransferFunctionImage();
     void setShading(bool enableShading);
     void setShadingThreshold(double thresh);
+	void setOpacityOffset(int offset);
 	void setPerspective(bool enabled);
 
 protected:
@@ -135,14 +136,15 @@ private:
 	// RENDERING PARAMETERS
 
     QColor backgroundColor;
-    int numSamples = 200;
-	const int NUM_SAMPLES_STATIC = 200;
-	const int NUM_SAMPLES_INTERACTION = 5;
+	int numSamples = 500;
+	const int NUM_SAMPLES_STATIC = 500;
+	const int NUM_SAMPLES_INTERACTIVE = 20;
     float sampleRangeStart = 0.000f;
     float sampleRangeEnd = 1.000f;
 	float shadingThreshold = 0.15f;
     CompositingMethod compositingMethod = CompositingMethod::MIP;
     bool enableShading = false;
+	float opacityOffset = 0;
 
 	// UI AND INTERACTION
 

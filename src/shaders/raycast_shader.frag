@@ -16,6 +16,7 @@ uniform float sampleRangeStart;
 uniform float sampleRangeEnd;
 uniform float shadingThreshold;
 uniform vec2 screenDimensions;
+uniform float opacityOffset;
 
 // COMPOSITING METHODS
 // 0: Maximum Intensity Projection
@@ -44,7 +45,7 @@ void main()
     vec3  firstHitPos = vec3(0);
 
     vec3 lightPos = vec3(5, 5, 5);
-    vec3 lightAmb = vec3(0.4);
+    vec3 lightAmb = vec3(0.7);
     vec3 lightDif = vec3(0.7);
     vec3 lightSpec = vec3(0.6);
 
@@ -79,11 +80,14 @@ void main()
                 if (intensity > 0.0) {
                     intensityCount += 1;
                 }
+            } else if (compositingMethod == 2) { // MAXIMUM INTENSITY DIFFERENCE ACCUMULATION
 
-            } else if (compositingMethod == 2) { // ALPHA COMPOSITING (
+                // TODO
+
+            } else if (compositingMethod == 3) { // ALPHA COMPOSITING (
 
                 mappedColor = texture(transferFunction, intensity);
-                mappedColor.a = intensity;
+                mappedColor.a = intensity + opacityOffset;
 
                 colorAccum += mappedColor * mappedColor.a * (1 - colorAccum.a);
 
@@ -104,17 +108,17 @@ void main()
         outColor = vec4(vec3(maxIntensity), 1.0); //*/
 
     } else if (compositingMethod == 1) { // AVERAGE INTENSITY PROJECTION
-        //float numSamplesFl = 1.0 * numSamples;
         intensityCount = intensityCount > 0.0 ? intensityCount : numSamples;
         float avgIntensity = intensityAccum / intensityCount;
         if (avgIntensity > 1.0) { avgIntensity = 1.0; }
         outColor = texture(transferFunction, avgIntensity);
 
     } else if (compositingMethod == 2) {  // MIDA COMPOSITING
-        // TODO
         outColor = colorAccum;
+
     } else if (compositingMethod == 3) {  // ALPHA COMPOSITING
         outColor = colorAccum;
+
     }
 
     // BLINN PHONG ILLUMINATION MODEL
