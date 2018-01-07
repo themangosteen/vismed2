@@ -269,6 +269,9 @@
              <property name="text">
               <string>Shaded</string>
              </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item>

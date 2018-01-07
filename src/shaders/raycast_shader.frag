@@ -115,7 +115,7 @@ void main()
 
 
                 mappedColor = texture(transferFunction, intensity);
-                mappedColor.a = intensity + opacityOffset; // alpha is opacity, i.e. occlusion
+                mappedColor.a = intensity + opacityOffset/10; // alpha is opacity, i.e. occlusion
 
                 float weight = 0;
                 if (intensity > maxIntensity) {
@@ -139,7 +139,7 @@ void main()
             else if (compositingMethod == 3) { // ALPHA COMPOSITING
 
                 mappedColor = texture(transferFunction, intensity);
-                mappedColor.a = intensity + opacityOffset; // alpha is opacity, i.e. occlusion
+                mappedColor.a = intensity + opacityOffset/10; // alpha is opacity, i.e. occlusion
 
                 // how much of a voxel mappedColor shines through depends on its own opacity mappedColor.a
                 // and how much transparency (1 - colorAccum.a) is left to viewer after accumulation of opacity colorAccum.a

@@ -143,7 +143,7 @@ private:
     float sampleRangeEnd = 1.000f;
 	float shadingThreshold = 0.15f;
     CompositingMethod compositingMethod = CompositingMethod::MIP;
-    bool enableShading = false;
+	bool enableShading = false;
 	float opacityOffset = 0;
 
 	// UI AND INTERACTION
