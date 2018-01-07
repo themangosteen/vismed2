@@ -37,6 +37,7 @@ protected slots :
 	void closeAction();
 	void setCompositing(int mode);
     void setShading();
+	void setPerspective(bool enabled);
 
 private:
 

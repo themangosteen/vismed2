@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->loadDataPushButton, &QPushButton::clicked, this, &MainWindow::openFileAction);
 	connect(ui->loadTffImageButton, &QPushButton::clicked, glWidget, &GLWidget::loadTransferFunctionImage);
 	connect(ui->shadedCheckBox, &QCheckBox::clicked, glWidget, &GLWidget::setShading);
-	connect(ui->perspectiveCheckBox, &QCheckBox::clicked, glWidget, &GLWidget::setPerspective);
+	connect(ui->perspectiveCheckBox, &QCheckBox::clicked, this, &MainWindow::setPerspective);
 
 }
 
@@ -108,6 +108,18 @@ void MainWindow::setCompositing(int mode)
 
 void MainWindow::setShading()
 {
-    glWidget->setShading(ui->shadedCheckBox->isChecked());
+	glWidget->setShading(ui->shadedCheckBox->isChecked());
+}
+
+void MainWindow::setPerspective(bool enabled)
+{
+	if (enabled) {
+		ui->label3DInteractionHelp->setText("ROTATE: left mouse, PAN: shift + left mouse, ZOOM PERSPECTIVE: alt + left mouse");
+	}
+	else {
+		ui->label3DInteractionHelp->setText("ROTATE: left mouse, PAN: shift + left mouse");
+	}
+
+	glWidget->setPerspective(enabled);
 }
 

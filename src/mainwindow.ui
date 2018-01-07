@@ -544,9 +544,9 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="label3DInteractionHelp">
         <property name="text">
-         <string>ROTATE: left mouse, PAN: shift + left mouse, ZOOM PERSPECTIVE: alt + left mouse</string>
+         <string>ROTATE: left mouse, PAN: shift + left mouse</string>
         </property>
        </widget>
       </item>
