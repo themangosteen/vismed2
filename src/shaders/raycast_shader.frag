@@ -41,7 +41,6 @@ void main()
     vec3  currentVoxelPos = entryPos;
 
     // Shading
-    vec3  normal = vec3(0);
     vec3  view = vec3(0, 0, 10); // view vector pointing to camera
     vec3  firstHitPos = vec3(0); // first hit voxel position
 
@@ -66,7 +65,6 @@ void main()
             intensity = texture(volume, currentVoxelPos).r;
 
             if (firstHitPos == vec3(0) && intensity > shadingThreshold) {
-                //normal = normalize(texture(gradients, currentVoxelPos).rgb);
                 firstHitPos = currentVoxelPos;
             }
 
@@ -185,27 +183,34 @@ void main()
 
     // SHADING VIA BLINN PHONG ILLUMINATION MODEL
     if (enableShading) {
+
+        // approx. surface gradient at current voxel pos
         vec3 gradient;
         gradient.x = texture(volume, vec3(firstHitPos.x+sampleStepSize, firstHitPos.yz)).r - texture(volume, vec3(firstHitPos.x-sampleStepSize, firstHitPos.yz)).r;
         gradient.y = texture(volume, vec3(firstHitPos.x, firstHitPos.y+sampleStepSize, firstHitPos.z)).r - texture(volume, vec3(firstHitPos.x, firstHitPos.y-sampleStepSize, firstHitPos.z)).r;
         gradient.z = texture(volume, vec3(firstHitPos.xy, firstHitPos.z+sampleStepSize)).r - texture(volume, vec3(firstHitPos.xy, firstHitPos.z-sampleStepSize)).r;
-        normal = normalize(gradient);
-        vec3  surfaceColor = outColor.rgb;
-        float surfaceAlpha = outColor.a;
-        vec3  lightDir = normalize(lightPos - firstHitPos);
-        vec3  ambient = lightAmb * surfaceColor;
-        vec3  diffuse = max(dot(normal, lightDir), 0.0f) * surfaceColor;
-        float shininess = 3.f;
+        float gradientMagnitude = length(gradient);
+        vec3 normal = normalize(gradient);
 
+        // blinn-phong
+        vec3 lightDir = normalize(lightPos - firstHitPos);
+        vec3 ambient = lightAmb;
+        vec3 diffuse = max(dot(normal, lightDir), 0.0f) * lightDif;
+        float shininess = 3.f;
         vec3 halfVec = normalize(lightDir + view); // half vector of light and view vectors
         vec3 specular = pow(max(dot(halfVec, normal), 0.0f), shininess) * lightSpec;
 
-        outColor = vec4(vec3(ambient + diffuse + specular), surfaceAlpha);
+        vec3 unshadedColor = outColor.rgb;
+        vec3 shadedColor = vec3(ambient + diffuse + specular) * outColor.rgb;
+
+        // weight contribution of shading based on gradient magnitude to avoid applying shading to noise
+        float shadingWeight = gradientMagnitude + (1 - gradientMagnitude)/2;
+        outColor = vec4(shadingWeight * shadedColor + (1 - shadingWeight) * unshadedColor, outColor.a);
+
     }
 
-
     // DEBUG DRAW FRONT FACES (RAY ENTRY POSITIONS) / BACK FACES (RAY EXIT POSITIONS
-    //outColor = vec4(entryPos, 1.0);
+    // vec4(entryPos, 1.0);
     //outColor = vec4(exitPos, 1.0);
 
 }
