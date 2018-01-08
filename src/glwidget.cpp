@@ -2,6 +2,20 @@
 
 #include "mainwindow.h"
 
+GLWidget::GLWidget(QWidget *parent)
+    : QOpenGLWidget(parent)
+    , volume(nullptr)
+{
+	mainWindow = qobject_cast<MainWindow *>(this->parent()->parent()->parent());
+
+	// set minimum required opengl version
+	QSurfaceFormat format = QSurfaceFormat();
+	format.setVersion(4, 5);
+	format.setProfile(QSurfaceFormat::CoreProfile);
+	this->setFormat(format);
+	qDebug() << this->format() << "\n";
+}
+
 GLWidget::~GLWidget()
 {
 	delete logger;
@@ -17,6 +31,7 @@ GLWidget::~GLWidget()
 
 void GLWidget::initializeGL()
 {
+
 	QWidget::setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 
 	initializeOpenGLFunctions();
@@ -33,7 +48,7 @@ void GLWidget::initializeGL()
 	QString vendor = QString((const char*)glGetString(GL_VENDOR));
 	QString renderer = QString((const char*)glGetString(GL_RENDERER));
 
-	QString deviceInfoString = "Graphics Device:\n" + renderer + "\nby " + vendor + "\n\nOpenGL version: " + glversion;
+	QString deviceInfoString = "Graphics Device:\n" + renderer + "\nby " + vendor + "\nHighest supported OpenGL version: " + glversion;
 	qDebug().noquote() << deviceInfoString;
 
 	// load, compile and link vertex and fragment shaders

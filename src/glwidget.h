@@ -23,12 +23,7 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-	explicit GLWidget(QWidget *parent)
-	    : QOpenGLWidget(parent)
-	    , volume(nullptr)
-	{
-        mainWindow = qobject_cast<MainWindow *>(this->parent()->parent()->parent());
-    }
+	GLWidget(QWidget *parent);
     ~GLWidget();
 
     enum CompositingMethod {

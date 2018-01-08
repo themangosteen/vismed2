@@ -210,7 +210,7 @@ void main()
     }
 
     // DEBUG DRAW FRONT FACES (RAY ENTRY POSITIONS) / BACK FACES (RAY EXIT POSITIONS
-    // vec4(entryPos, 1.0);
+    //outColor = vec4(entryPos, 1.0);
     //outColor = vec4(exitPos, 1.0);
 
 }
