@@ -135,7 +135,7 @@ void main()
                 // midaParam is in range [-1,1] and used to interpolated between using DVR, MIDA and MIP
                 // if it is -1, the weight is 0, thus leading to DVR
                 // if it is 0, the weight is just the weight, i.e. MIDA
-                // if it is 1
+                // if it is 1, instead of changing the weight we later interpolate resulting colors between MIDA and max value
                 if (midaParam < 0) {
                     weight = weight*(1 + midaParam);
                 }
@@ -173,15 +173,20 @@ void main()
 
     if (compositingMethod == 0) { // ALPHA COMPOSITING
         outColor = colorAccum;
-
     }
     else if (compositingMethod == 1) { // MIDA COMPOSITING
-        outColor = colorAccum;
+
+        // interpolate resulting colors between MIDA and max value (MIP)
+        if (midaParam > 0) {
+            vec4 maxColor = texture(transferFunction, maxIntensity);
+            outColor = midaParam * maxColor + (1 - midaParam) * colorAccum;
+        }
+        else {
+            outColor = colorAccum;
+        }
     }
     else if (compositingMethod == 2) { // MAXIMUM INTENSITY PROJECTION
-        // <-- toggle transfer function
-        outColor = texture(transferFunction, maxIntensity); /*/
-        outColor = vec4(vec3(maxIntensity), 1.0); //*/
+        outColor = texture(transferFunction, maxIntensity);
     }
     else if (compositingMethod == 3) { // AVERAGE INTENSITY PROJECTION
         intensityCount = intensityCount > 0.0 ? intensityCount : numSamples;
