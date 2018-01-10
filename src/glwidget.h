@@ -27,10 +27,10 @@ public:
     ~GLWidget();
 
     enum CompositingMethod {
-        MIP        = 0,
-        AVERAGE    = 1,
-		MIDA       = 2,
-		ALPHA      = 3
+		ALPHA      = 0,
+		MIDA       = 1,
+		MIP        = 2,
+		AVERAGE    = 3
     };
 
 public slots:
@@ -44,7 +44,8 @@ public slots:
     void loadTransferFunctionImage();
     void setShading(bool enableShading);
     void setShadingThreshold(double thresh);
-	void setOpacityOffset(int offset);
+	void setOpacityOffset(float offset);
+	void setMIDAParam(float value);
 	void setPerspective(bool enabled);
 
 protected:
@@ -137,9 +138,10 @@ private:
     float sampleRangeStart = 0.000f;
     float sampleRangeEnd = 1.000f;
 	float shadingThreshold = 0.15f;
-    CompositingMethod compositingMethod = CompositingMethod::MIP;
+	CompositingMethod compositingMethod = CompositingMethod::MIDA;
 	bool enableShading = false;
 	float opacityOffset = 0;
+	float midaParam = 0;
 
 	// UI AND INTERACTION
 

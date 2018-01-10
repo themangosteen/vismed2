@@ -283,6 +283,7 @@ void GLWidget::paintGL()
 	raycastShader->setUniformValue("enableShading", enableShading);
     raycastShader->setUniformValue("shadingThreshold", shadingThreshold);
 	raycastShader->setUniformValue("opacityOffset", opacityOffset);
+	raycastShader->setUniformValue("midaParam", midaParam);
 
 	raycastShader->setUniformValue("transferFunction", 0); // bind shader uniform to texture unit 0
     transferFunction1DTex->bind(0); // bind texture to texture unit 0
@@ -363,9 +364,17 @@ void GLWidget::setShadingThreshold(double thresh)
     repaint();
 }
 
-void GLWidget::setOpacityOffset(int offset)
+// offset in range [-1,1]
+void GLWidget::setOpacityOffset(float offset)
 {
-	this->opacityOffset = offset/1000.f;
+	this->opacityOffset = offset;
+	repaint();
+}
+
+// value in range [-1,1]
+void GLWidget::setMIDAParam(float value)
+{
+	this->midaParam = value;
 	repaint();
 }
 

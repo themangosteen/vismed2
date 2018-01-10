@@ -16,13 +16,14 @@ uniform float sampleRangeStart; // skip samples up to this point
 uniform float sampleRangeEnd; // skip samples after this point
 uniform float shadingThreshold;
 uniform vec2 screenDimensions;
-uniform float opacityOffset;
+uniform float opacityOffset; // in range [-1,1]
+uniform float midaParam; // in range [-1,1]
 
 // COMPOSITING METHODS
-// 0: Maximum Intensity Projection
-// 1: Average Intensity Projection
-// 2: Maximum Intensity Difference Accumulation
-// 3: Alpha compositing
+// 0: Alpha compositing ("DVR")
+// 1: Maximum Intensity Difference Accumulation
+// 2: Maximum Intensity Projection
+// 3: Average Intensity Projection
 uniform int compositingMethod;
 uniform bool enableShading;
 
@@ -68,18 +69,26 @@ void main()
                 firstHitPos = currentVoxelPos;
             }
 
-            if (compositingMethod == 0) { // MAXIMUM INTENSITY PROJECTION
-                if (intensity > maxIntensity) {
-                    maxIntensity = intensity;
+
+            if (compositingMethod == 0) { // ALPHA COMPOSITING
+
+                mappedColor = texture(transferFunction, intensity);
+                mappedColor.a = intensity + opacityOffset/10; // alpha is opacity, i.e. occlusion
+
+                // how much of a voxel mappedColor shines through depends on its own opacity mappedColor.a
+                // and how much transparency (1 - colorAccum.a) is left to viewer after accumulation of opacity colorAccum.a
+                colorAccum.rgb = colorAccum.rgb
+                               + (1 - colorAccum.a) * mappedColor.a * mappedColor.rgb;
+                colorAccum.a = colorAccum.a
+                             + (1 - colorAccum.a) * mappedColor.a;
+
+                if (colorAccum.a > 1.0) {
+                    colorAccum.a = 1.0;
+                    break; // terminate if accumulated opacity > 1
                 }
             }
-            else if (compositingMethod == 1) { // AVERAGE INTENSITY PROJECTION
-                intensityAccum += intensity;
-                if (intensity > 0.0) {
-                    intensityCount += 1;
-                }
-            }
-            else if (compositingMethod == 2) { // MAXIMUM INTENSITY DIFFERENCE ACCUMULATION
+
+            if (compositingMethod == 1) { // MAXIMUM INTENSITY DIFFERENCE ACCUMULATION
 
                 // the traditional alpha compositing method here is referred to under broad term of DVR as in literature
                 //
@@ -123,6 +132,14 @@ void main()
                     maxIntensity = intensity;
                 }
 
+                // midaParam is in range [-1,1] and used to interpolated between using DVR, MIDA and MIP
+                // if it is -1, the weight is 0, thus leading to DVR
+                // if it is 0, the weight is just the weight, i.e. MIDA
+                // if it is 1
+                if (midaParam < 0) {
+                    weight = weight*(1 + midaParam);
+                }
+
                 // how much of a voxel mappedColor shines through depends on its own opacity mappedColor.a
                 // and how much transparency (1 - colorAccum.a) is left to viewer after accumulation of opacity colorAccum.a
                 colorAccum.rgb = (1 - weight) * colorAccum.rgb
@@ -134,23 +151,18 @@ void main()
                     colorAccum.a = 1.0;
                     break; // terminate if accumulated opacity > 1
                 }
-
             }
-            else if (compositingMethod == 3) { // ALPHA COMPOSITING
 
-                mappedColor = texture(transferFunction, intensity);
-                mappedColor.a = intensity + opacityOffset/10; // alpha is opacity, i.e. occlusion
+            else if (compositingMethod == 2) { // MAXIMUM INTENSITY PROJECTION
+                if (intensity > maxIntensity) {
+                    maxIntensity = intensity;
+                }
+            }
 
-                // how much of a voxel mappedColor shines through depends on its own opacity mappedColor.a
-                // and how much transparency (1 - colorAccum.a) is left to viewer after accumulation of opacity colorAccum.a
-                colorAccum.rgb = colorAccum.rgb
-                               + (1 - colorAccum.a) * mappedColor.a * mappedColor.rgb;
-                colorAccum.a = colorAccum.a
-                             + (1 - colorAccum.a) * mappedColor.a;
-
-                if (colorAccum.a > 1.0) {
-                    colorAccum.a = 1.0;
-                    break; // terminate if accumulated opacity > 1
+            else if (compositingMethod == 3) { // AVERAGE INTENSITY PROJECTION
+                intensityAccum += intensity;
+                if (intensity > 0.0) {
+                    intensityCount += 1;
                 }
             }
 
@@ -159,25 +171,23 @@ void main()
         currentVoxelPos += rayDelta;
     }
 
-    if (compositingMethod == 0) { // MAXIMUM INTENSITY PROJECTION
+    if (compositingMethod == 0) { // ALPHA COMPOSITING
+        outColor = colorAccum;
+
+    }
+    else if (compositingMethod == 1) { // MIDA COMPOSITING
+        outColor = colorAccum;
+    }
+    else if (compositingMethod == 2) { // MAXIMUM INTENSITY PROJECTION
         // <-- toggle transfer function
         outColor = texture(transferFunction, maxIntensity); /*/
         outColor = vec4(vec3(maxIntensity), 1.0); //*/
     }
-    else if (compositingMethod == 1) { // AVERAGE INTENSITY PROJECTION
+    else if (compositingMethod == 3) { // AVERAGE INTENSITY PROJECTION
         intensityCount = intensityCount > 0.0 ? intensityCount : numSamples;
         float avgIntensity = intensityAccum / intensityCount;
         if (avgIntensity > 1.0) { avgIntensity = 1.0; }
         outColor = texture(transferFunction, avgIntensity);
-
-    }
-    else if (compositingMethod == 2) {  // MIDA COMPOSITING
-        outColor = colorAccum;
-
-    }
-    else if (compositingMethod == 3) {  // ALPHA COMPOSITING
-        outColor = colorAccum;
-
     }
 
 
