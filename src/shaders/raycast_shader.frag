@@ -51,6 +51,7 @@ void main()
     vec3 lightSpec = vec3(0.6);
 
     float intensity = 0.0;
+    float minIntensity = 1.0;
     float maxIntensity = 0.0;
     float intensityAccum = 0.0;
     float intensityCount = 0.0;
@@ -166,6 +167,12 @@ void main()
                 }
             }
 
+            else if (compositingMethod == 4) { // MINIMUM INTENSITY PROJECTION
+                if (intensity < minIntensity) {
+                    minIntensity = intensity;
+                }
+            }
+
         }
 
         currentVoxelPos += rayDelta;
@@ -193,6 +200,9 @@ void main()
         float avgIntensity = intensityAccum / intensityCount;
         if (avgIntensity > 1.0) { avgIntensity = 1.0; }
         outColor = texture(transferFunction, avgIntensity);
+    }
+    else if (compositingMethod == 4) { // MINIMUM INTENSITY PROJECTION
+        outColor = texture(transferFunction, minIntensity);
     }
 
 

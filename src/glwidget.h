@@ -27,10 +27,11 @@ public:
     ~GLWidget();
 
     enum CompositingMethod {
-		ALPHA      = 0,
-		MIDA       = 1,
-		MIP        = 2,
-		AVERAGE    = 3
+		ALPHA      = 0, // alpha compositing ("dvr")
+		MIDA       = 1, // maximum intensity difference accumulation (allows interpolation between dvr and mip)
+		MIP        = 2, // maximum intensity projection
+		AVERAGE    = 3, // average intensity projection
+		MINIP      = 4  // minimum intensity projection
     };
 
 public slots:

@@ -161,6 +161,11 @@
                  <string>Average Intensity Projection</string>
                 </property>
                </item>
+               <item>
+                <property name="text">
+                 <string>Minimum Intensity Projection</string>
+                </property>
+               </item>
               </widget>
              </item>
              <item>
