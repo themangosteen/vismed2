@@ -24,7 +24,10 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->sampleStartSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), glWidget, &GLWidget::setSampleRangeStart);
 	connect(ui->sampleEndSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), glWidget, &GLWidget::setSampleRangeEnd);
     connect(ui->shadingThresholdSpinbox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), glWidget, &GLWidget::setShadingThreshold);
-	connect(ui->opacityOffsetSlider, &QSlider::valueChanged, [this](int offset) { glWidget->setOpacityOffset(offset/1000.f); } );
+	connect(ui->opacityFactorSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), glWidget, &GLWidget::setOpacityFactor);
+	connect(ui->opacityOffsetSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), glWidget, &GLWidget::setOpacityOffset);
+	connect(ui->ttfSampleFactorSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), glWidget, &GLWidget::setTTFSampleFactor);
+	connect(ui->ttfSampleOffsetSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), glWidget, &GLWidget::setTTFSampleOffset);
 	connect(ui->midaParamSlider, &QSlider::valueChanged, [this](int value) { glWidget->setMIDAParam(value/1000.f); } );
 	connect(ui->compositingModeComboBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &MainWindow::setCompositing);
 	connect(ui->loadDataPushButton, &QPushButton::clicked, this, &MainWindow::openFileAction);

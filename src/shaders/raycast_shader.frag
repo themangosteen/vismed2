@@ -16,7 +16,10 @@ uniform float sampleRangeStart; // skip samples up to this point
 uniform float sampleRangeEnd; // skip samples after this point
 uniform float shadingThreshold;
 uniform vec2 screenDimensions;
-uniform float opacityOffset; // in range [-1,1]
+uniform float opacityFactor;
+uniform float opacityOffset;
+uniform float ttfSampleFactor; // multiply transfer function texture sample position
+uniform float ttfSampleOffset; // offset transfer function texture sample position
 uniform float midaParam; // in range [-1,1]
 
 // COMPOSITING METHODS
@@ -73,8 +76,8 @@ void main()
 
             if (compositingMethod == 0) { // ALPHA COMPOSITING
 
-                mappedColor = texture(transferFunction, intensity);
-                mappedColor.a = intensity + opacityOffset/10; // alpha is opacity, i.e. occlusion
+                mappedColor = texture(transferFunction, intensity * ttfSampleFactor + ttfSampleOffset);
+                mappedColor.a = intensity * opacityFactor + opacityOffset; // alpha is opacity, i.e. occlusion
 
                 // how much of a voxel mappedColor shines through depends on its own opacity mappedColor.a
                 // and how much transparency (1 - colorAccum.a) is left to viewer after accumulation of opacity colorAccum.a
@@ -124,8 +127,8 @@ void main()
                 // important structures shining through as in MIP combined with depth cue from some accumulation
 
 
-                mappedColor = texture(transferFunction, intensity);
-                mappedColor.a = intensity + opacityOffset/10; // alpha is opacity, i.e. occlusion
+                mappedColor = texture(transferFunction, intensity * ttfSampleFactor + ttfSampleOffset);
+                mappedColor.a = intensity * opacityFactor + opacityOffset; // alpha is opacity, i.e. occlusion
 
                 float weight = 0;
                 if (intensity > maxIntensity) {
@@ -185,7 +188,7 @@ void main()
 
         // interpolate resulting colors between MIDA and max value (MIP)
         if (midaParam > 0) {
-            vec4 maxColor = texture(transferFunction, maxIntensity);
+            vec4 maxColor = texture(transferFunction, maxIntensity * ttfSampleFactor + ttfSampleOffset);
             outColor = midaParam * maxColor + (1 - midaParam) * colorAccum;
         }
         else {
@@ -193,16 +196,16 @@ void main()
         }
     }
     else if (compositingMethod == 2) { // MAXIMUM INTENSITY PROJECTION
-        outColor = texture(transferFunction, maxIntensity);
+        outColor = texture(transferFunction, maxIntensity * ttfSampleFactor + ttfSampleOffset);
     }
     else if (compositingMethod == 3) { // AVERAGE INTENSITY PROJECTION
         intensityCount = intensityCount > 0.0 ? intensityCount : numSamples;
         float avgIntensity = intensityAccum / intensityCount;
-        if (avgIntensity > 1.0) { avgIntensity = 1.0; }
-        outColor = texture(transferFunction, avgIntensity);
+        avgIntensity = min(avgIntensity, 1.0);
+        outColor = texture(transferFunction, avgIntensity * ttfSampleFactor + ttfSampleOffset);
     }
     else if (compositingMethod == 4) { // MINIMUM INTENSITY PROJECTION
-        outColor = texture(transferFunction, minIntensity);
+        outColor = texture(transferFunction, minIntensity * ttfSampleFactor + ttfSampleOffset);
     }
 
 

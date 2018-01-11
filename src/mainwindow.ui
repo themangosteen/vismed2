@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>600</height>
+    <height>616</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -93,6 +93,12 @@
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QCheckBox" name="perspectiveCheckBox">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>20</height>
+           </size>
+          </property>
           <property name="text">
            <string>Perspective</string>
           </property>
@@ -135,6 +141,12 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>27</height>
+                </size>
+               </property>
                <property name="maximumSize">
                 <size>
                  <width>16777215</width>
@@ -173,6 +185,12 @@
              </item>
              <item>
               <widget class="QSlider" name="midaParamSlider">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>25</height>
+                </size>
+               </property>
                <property name="minimum">
                 <number>-1000</number>
                </property>
@@ -261,28 +279,129 @@
               </font>
              </property>
              <property name="text">
-              <string>Opacity Offset</string>
+              <string>Opacity Factor &amp; Offset</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QSlider" name="opacityOffsetSlider">
-             <property name="minimum">
-              <number>-1000</number>
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <property name="topMargin">
+              <number>0</number>
              </property>
-             <property name="maximum">
-              <number>1000</number>
+             <item>
+              <widget class="QDoubleSpinBox" name="opacityFactorSpinBox">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>26</height>
+                </size>
+               </property>
+               <property name="decimals">
+                <number>4</number>
+               </property>
+               <property name="minimum">
+                <double>-100.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="opacityOffsetSpinBox">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>26</height>
+                </size>
+               </property>
+               <property name="decimals">
+                <number>4</number>
+               </property>
+               <property name="minimum">
+                <double>-100.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.001000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+              </font>
              </property>
-             <property name="singleStep">
-              <number>1</number>
-             </property>
-             <property name="pageStep">
-              <number>1</number>
-             </property>
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+             <property name="text">
+              <string>Transfer Function Factor &amp; Offset</string>
              </property>
             </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QDoubleSpinBox" name="ttfSampleFactorSpinBox">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>26</height>
+                </size>
+               </property>
+               <property name="decimals">
+                <number>4</number>
+               </property>
+               <property name="minimum">
+                <double>-100.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="ttfSampleOffsetSpinBox">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>26</height>
+                </size>
+               </property>
+               <property name="decimals">
+                <number>4</number>
+               </property>
+               <property name="minimum">
+                <double>-100.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.001000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
@@ -370,8 +489,17 @@
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <property name="spacing">
+              <number>6</number>
+             </property>
              <item>
               <widget class="QLabel" name="numSamplesLabel">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>20</height>
+                </size>
+               </property>
                <property name="font">
                 <font>
                  <pointsize>11</pointsize>
@@ -447,7 +575,7 @@
               <widget class="QDoubleSpinBox" name="sampleStartSpinBox">
                <property name="minimumSize">
                 <size>
-                 <width>100</width>
+                 <width>80</width>
                  <height>0</height>
                 </size>
                </property>
@@ -482,10 +610,6 @@
                </property>
               </widget>
              </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
               <widget class="QLabel" name="sampleEndLabel">
                <property name="font">
@@ -502,7 +626,7 @@
               <widget class="QDoubleSpinBox" name="sampleEndSpinBox">
                <property name="minimumSize">
                 <size>
-                 <width>100</width>
+                 <width>80</width>
                  <height>0</height>
                 </size>
                </property>

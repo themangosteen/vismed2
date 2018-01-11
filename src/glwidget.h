@@ -45,7 +45,10 @@ public slots:
     void loadTransferFunctionImage();
     void setShading(bool enableShading);
     void setShadingThreshold(double thresh);
+	void setOpacityFactor(float factor);
 	void setOpacityOffset(float offset);
+	void setTTFSampleFactor(float factor);
+	void setTTFSampleOffset(float offset);
 	void setMIDAParam(float value);
 	void setPerspective(bool enabled);
 
@@ -141,8 +144,11 @@ private:
 	float shadingThreshold = 0.15f;
 	CompositingMethod compositingMethod = CompositingMethod::MIDA;
 	bool enableShading = false;
-	float opacityOffset = 0;
-	float midaParam = 0;
+	float opacityFactor = 1.f;
+	float opacityOffset = 0.f;
+	float ttfSampleFactor = 1.f;
+	float ttfSampleOffset = 0.f;
+	float midaParam = 0.f;
 
 	// UI AND INTERACTION
 
