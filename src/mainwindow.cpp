@@ -46,7 +46,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::openFileAction()
 {
-	QString filepath = QFileDialog::getOpenFileName(this, "Data File", 0, tr("Data Files (*.dat)"));
+	QString filepath = QFileDialog::getOpenFileName(this, "Load Volume Data File (*.dat)", 0, tr("Supported Volume Data Files: DAT (*.dat)"));
 
 	openFile(filepath);
 }
@@ -65,15 +65,13 @@ void MainWindow::openFile(QString filepath)
 		ui->progressBar->setEnabled(true);
 		ui->labelTop->setText("Loading data ...");
 
-		// load data according to file extension
-		if (fn.substr(fn.find_last_of(".") + 1) == "dat") // LOAD VOLUME
-		{
-			// create VOLUME
-			fileType.type = VOLUME;
-			volume = new Volume();
+		fileType.type = VOLUME;
+		volume = new Volume();
 
-			// load file
-			success = volume->loadFromFile(filepath, ui->progressBar);
+		// load volume data according to file extension
+		std::string fileExtension = fn.substr(fn.find_last_of(".") + 1);
+		if (fileExtension == "dat") {
+			success = volume->loadFromFileDAT(filepath, ui->progressBar);
 		}
 
 		ui->progressBar->setEnabled(false);

@@ -82,7 +82,7 @@ public:
 
 	const int getSize() const;
 
-	bool loadFromFile(QString filename, QProgressBar* progressBar);
+	bool loadFromFileDAT(QString filepath, QProgressBar* progressBar);
 
 private:
 
@@ -91,6 +91,7 @@ private:
 	int width;
 	int height;
 	int depth;
+	int bitsPerVoxel;
 
 	int size;
 

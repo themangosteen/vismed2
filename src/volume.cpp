@@ -181,78 +181,86 @@ const int Volume::getSize() const
 // Volume File Loader
 //-------------------------------------------------------------------------------------------------
 
-bool Volume::loadFromFile(QString filename, QProgressBar* progressBar)
+bool Volume::loadFromFileDAT(QString filepath, QProgressBar* progressBar)
 {
-	// load file
-	FILE *fp = fopen(filename.toStdString().c_str(), "rb");
-	if (!fp)
-	{
-		std::cerr << "+ Error loading file: " << filename.toStdString() << std::endl;
+	// open file
+	FILE *fp = fopen(filepath.toStdString().c_str(), "rb");
+	if (!fp) {
+		std::cerr << "Error opening file: " << filepath.toStdString() << std::endl;
 		return false;
 	}
-
-	// progress bar
 
 	progressBar->setRange(0, size + 10);
 	progressBar->setValue(0);
 
+	// READ HEADER AND SET VOLUME DIMENSIONS
 
-	// read header and set volume dimensions
+	// header format: 16 bit width, 16 bit height, 16 bit depth, 16 bit bitsPerVoxel
+	// then voxel data with bitsPerVoxel intensity resolution
 
-	unsigned short uWidth, uHeight, uDepth;
+	unsigned short uWidth, uHeight, uDepth, uBitsPerVoxel;
 	fread(&uWidth, sizeof(unsigned short), 1, fp);
 	fread(&uHeight, sizeof(unsigned short), 1, fp);
 	fread(&uDepth, sizeof(unsigned short), 1, fp);
+	fread(&uBitsPerVoxel, sizeof(unsigned short), 1, fp);
 	
 	width = int(uWidth);
 	height = int(uHeight);
 	depth = int(uDepth);
+	bitsPerVoxel = int(uBitsPerVoxel);
 
 	// check dataset dimensions
 	if (
-		width <= 0 || width > 1000 ||
+	    width  <= 0 || width  > 1000 ||
 		height <= 0 || height > 1000 ||
-		depth <= 0 || depth > 1000)
+	    depth  <= 0 || depth  > 1000)
 	{
-		std::cerr << "+ Error loading file: " << filename.toStdString() << std::endl;
-		std::cerr << "Unvalid dimensions - probably loaded .dat flow file instead of .gri file?" << std::endl;
+		std::cerr << "Error loading file. Invalid volume dimensions: " << filepath.toStdString() << std::endl;
 		return false;
 	}
 
 	// compute dimensions
 	int slice = width * height;
 	size = slice * depth;
-	//int test = INT_MAX;
 	voxels.resize(size);
 
-	// read volume data
+	// READ VOLUME DATA
 
 	// read into vector before writing data into volume to speed up process
-	std::vector<unsigned short> vecData;
-	vecData.resize(size);
-	fread((void*)&(vecData.front()), sizeof(unsigned short), size, fp);
+	// TODO unify this into using only bytes or shorts in all cases
+	std::vector<unsigned short> vecDataShorts;
+	std::vector<unsigned char> vecDataBytes;
+	if (bitsPerVoxel <= 8) {
+		vecDataBytes.resize(size);
+		fread((void*)&(vecDataBytes.front()), sizeof(unsigned char), size, fp);
+	}
+	else {
+		vecDataShorts.resize(size);
+		fread((void*)&(vecDataShorts.front()), sizeof(unsigned short), size, fp);
+	}
 	fclose(fp);
 
 	progressBar->setValue(10);
 
-
 	// store volume data
-
-	for (int i = 0; i < size; i++)
+	for (int i = 0; i < size; ++i)
 	{
-		// data is converted to FLOAT values in an interval of [0.0 .. 1.0];
-		// uses 4095.0f to normalize the data, because only 12bit are used for the
-		// data values, and then 4095.0f is the maximum possible value
-		const float value = fmax(0.0f, fmin(1.0f, float(vecData[i]) / 4095.0f));
+		// intensities are converted to float, mapping range [0, 2^bitsPerVoxel] to [0.0, 1.0]
+		float value;
+		if (bitsPerVoxel <= 8)
+			value = fmax(0.0f, fmin(1.0f, float(vecDataBytes[i]) / (1 << bitsPerVoxel)));
+		else
+			value = fmax(0.0f, fmin(1.0f, float(vecDataShorts[i]) / (1 << bitsPerVoxel)));
+
 		voxels[i] = Voxel(value);
 		
 		progressBar->setValue(10 + i);
-
 	}
 
 	progressBar->setValue(0);
 
-	std::cout << "Loaded VOLUME with dimensions " << width << " x " << height << " x " << depth << std::endl;
+	std::cout << "Loaded " << bitsPerVoxel << "-bit VOLUME with dimensions " << width << " x " << height << " x " << depth << std::endl;
 
 	return true;
 }
+

@@ -96,6 +96,9 @@
           <property name="text">
            <string>Perspective</string>
           </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>
@@ -163,7 +166,7 @@
                </item>
                <item>
                 <property name="text">
-                 <string>Minimum Intensity Projection</string>
+                 <string>Min. Intensity Projection</string>
                 </property>
                </item>
               </widget>

@@ -68,13 +68,13 @@ void GLWidget::initializeGL()
 
 	initCamera();
 
-	mainWindow->openFile("../data/head_256x256x224.dat");
+	mainWindow->openFile("../data/head_256x256x224_12bit.dat");
 
 }
 
 void GLWidget::initCamera()
 {
-	camera.setProjectionType(Qt3DRender::QCameraLens::OrthographicProjection);
+	camera.setProjectionType(Qt3DRender::QCameraLens::PerspectiveProjection);
 	camera.setPosition(QVector3D(0,-2,0));
 	camera.rotate(QQuaternion::fromEulerAngles(90,180,0));
 	camera.setViewCenter(QVector3D(0,0,0));
