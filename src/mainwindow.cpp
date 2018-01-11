@@ -85,7 +85,7 @@ void MainWindow::openFile(QString filepath)
 				type = "VOLUME";
 				emit dataLoaded(volume);
 			}
-			ui->labelTop->setText(QString("Loaded VOLUME [%1 x %2 x %3] \n %4").arg(QString::number(volume->getWidth()), QString::number(volume->getHeight()), QString::number(volume->getDepth()), filepath));
+			ui->labelTop->setText(QString("Loaded %1-bit VOLUME [%2 x %3 x %4]\n%5").arg(QString::number(volume->getBitsPerVoxel()), QString::number(volume->getWidth()), QString::number(volume->getHeight()), QString::number(volume->getDepth()), filepath));
 		}
 		else
 		{

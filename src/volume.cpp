@@ -168,6 +168,11 @@ const int Volume::getHeight() const
 const int Volume::getDepth() const
 {
 	return depth;
+}
+
+const int Volume::getBitsPerVoxel() const
+{
+	return bitsPerVoxel;
 };
 
 const int Volume::getSize() const

@@ -79,6 +79,7 @@ public:
 	const int getWidth() const;
 	const int getHeight() const;
 	const int getDepth() const;
+	const int getBitsPerVoxel() const;
 
 	const int getSize() const;
 
