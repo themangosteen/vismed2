@@ -282,6 +282,8 @@ void GLWidget::paintGL()
 	raycastShader->setUniformValue("compositingMethod", compositingMethod);
 	raycastShader->setUniformValue("enableShading", enableShading);
     raycastShader->setUniformValue("shadingThreshold", shadingThreshold);
+	raycastShader->setUniformValue("intensityClampMin", intensityClampMin);
+	raycastShader->setUniformValue("intensityClampMax", intensityClampMax);
 	raycastShader->setUniformValue("opacityFactor", opacityFactor);
 	raycastShader->setUniformValue("opacityOffset", opacityOffset);
 	raycastShader->setUniformValue("ttfSampleFactor", ttfSampleFactor);
@@ -335,8 +337,8 @@ void GLWidget::drawVolumeBBoxCube(GLenum glFaceCullMode, QOpenGLShaderProgram *s
 
 void GLWidget::setPerspective(bool enabled)
 {
-	if (enabled)
-		camera.setProjectionType(Qt3DRender::QCameraLens::PerspectiveProjection);
+    if (enabled)
+        camera.setProjectionType(Qt3DRender::QCameraLens::PerspectiveProjection);
 	else
 		camera.setProjectionType(Qt3DRender::QCameraLens::OrthographicProjection);
 
@@ -367,6 +369,16 @@ void GLWidget::setShadingThreshold(double thresh)
     repaint();
 }
 
+void GLWidget::setIntensityClampMin(float value)
+{
+	intensityClampMin = value;
+}
+
+void GLWidget::setIntensityClampMax(float value)
+{
+	intensityClampMax = value;
+}
+
 void GLWidget::setOpacityFactor(float factor)
 {
 	this->opacityFactor = factor;
@@ -386,14 +398,12 @@ void GLWidget::setTTFSampleFactor(float factor)
 	repaint();
 }
 
-// offset transfer function texture lookup position
 void GLWidget::setTTFSampleOffset(float offset)
 {
 	this->ttfSampleOffset = offset;
 	repaint();
 }
 
-// value in range [-1,1]
 void GLWidget::setMIDAParam(float value)
 {
 	this->midaParam = value;

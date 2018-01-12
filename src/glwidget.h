@@ -36,20 +36,58 @@ public:
 
 public slots:
 
-    void dataLoaded(Volume *volume);
+	void dataLoaded(Volume *volume);
 
+	// set total number of samples along the ray
     void setNumSamples(int numSamples);
+
+	// samples before this sample point along the ray are ignored
     void setSampleRangeStart(double sampleRangeStart);
+
+	// samples after this sample point along the ray are ignored
     void setSampleRangeEnd(double sampleRangeEnd);
+
+	// set the CompositingMethod
     void setCompositingMethod(CompositingMethod m);
+
+	// load 1D transfer function texture from which colors are sampled based on intensity
     void loadTransferFunctionImage();
+
+	// enable or disable gradient-based shading
     void setShading(bool enableShading);
+
+	// set threshold when gradient-based shading should start
     void setShadingThreshold(double thresh);
+
+	// dont draw voxels with intensity below this value
+	void setIntensityClampMin(float value);
+
+	// dont draw voxels with intensity higher than this value
+	void setIntensityClampMax(float value);
+
+	// multiply opacity used in accumulation
 	void setOpacityFactor(float factor);
+
+	// offset opacity used in accumulation
 	void setOpacityOffset(float offset);
+
+	// multiply transfer function texture lookup position
 	void setTTFSampleFactor(float factor);
+
+	// offset transfer function texture lookup position
 	void setTTFSampleOffset(float offset);
+
+	// set parameter for MIDA compositing method
+	// value in range [-1,1]
+	// -1: like DVR, colors are accumulated like in traditional DVR alpha compositing
+	//  1: like MIP, previously accumulated color is ignored, only highest intensity is projected
+	// the higher the value, the higher the contribution of values that represent new maxima
+	// and the less previous accumulation is weighted, leaving more transparency for new to shine through.
+	// usually param will be inbetween, thus giving the advantage of
+	// important structures shining through as in MIP combined with depth cue from some accumulation.
 	void setMIDAParam(float value);
+
+	// switch between perspective and orthographic camera projection mode
 	void setPerspective(bool enabled);
 
 protected:
@@ -144,6 +182,8 @@ private:
 	float shadingThreshold = 0.15f;
 	CompositingMethod compositingMethod = CompositingMethod::MIDA;
 	bool enableShading = false;
+	float intensityClampMin = 0.f;
+	float intensityClampMax = 1.f;
 	float opacityFactor = 1.f;
 	float opacityOffset = 0.f;
 	float ttfSampleFactor = 1.f;

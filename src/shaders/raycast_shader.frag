@@ -16,6 +16,8 @@ uniform float sampleRangeStart; // skip samples up to this point
 uniform float sampleRangeEnd; // skip samples after this point
 uniform float shadingThreshold;
 uniform vec2 screenDimensions;
+uniform float intensityClampMin;
+uniform float intensityClampMax;
 uniform float opacityFactor;
 uniform float opacityOffset;
 uniform float ttfSampleFactor; // multiply transfer function texture sample position
@@ -68,6 +70,9 @@ void main()
         if (i >= sampleRangeStart * numSamples && i <= sampleRangeEnd * numSamples) {
 
             intensity = texture(volume, currentVoxelPos).r;
+
+            if (intensity < intensityClampMin || intensity > intensityClampMax)
+                continue;
 
             if (firstHitPos == vec3(0) && intensity > shadingThreshold) {
                 firstHitPos = currentVoxelPos;
