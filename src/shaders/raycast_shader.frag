@@ -71,8 +71,11 @@ void main()
 
             intensity = texture(volume, currentVoxelPos).r;
 
-            if (intensity < intensityClampMin || intensity > intensityClampMax)
+            if (intensity < intensityClampMin || intensity > intensityClampMax) {
                 intensity = 0;
+                mappedColor = vec4(0);
+            }
+
 
             if (firstHitPos == vec3(0) && intensity > shadingThreshold) {
                 firstHitPos = currentVoxelPos;
