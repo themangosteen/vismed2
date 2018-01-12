@@ -371,12 +371,14 @@ void GLWidget::setShadingThreshold(double thresh)
 
 void GLWidget::setIntensityClampMin(float value)
 {
-	intensityClampMin = value;
+	this->intensityClampMin = value;
+	repaint();
 }
 
 void GLWidget::setIntensityClampMax(float value)
 {
-	intensityClampMax = value;
+	this->intensityClampMax = value;
+	repaint();
 }
 
 void GLWidget::setOpacityFactor(float factor)
